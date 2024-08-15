@@ -55,7 +55,7 @@ def send_webhook_message(message) -> int:
     return response.status
 
 
-def lambda_handler():
+def lambda_handler(event, context):
     total_value = calculate_portfolio_value()
     formatted_value = f"£{total_value:,.2f}"
     message = f"Total Portfolio Value: {formatted_value}"

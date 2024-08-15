@@ -25,11 +25,10 @@ def calculate_portfolio_value() -> float:
     total_value = 0
 
     for asset in PORTFOLIO:
-        asset_name = asset["asset_name"]
         asset_ticker = asset["asset_ticker"]
         quantity = asset["quantity"]
 
-        if asset_name == "cash":
+        if asset_ticker == "cash":
             total_value += quantity
         else:
             adjusted_close_price = get_eod_adjusted_close_price(asset_ticker)

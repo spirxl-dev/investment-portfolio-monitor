@@ -14,8 +14,8 @@ PORTFOLIO: list = [
         "currency": "GBP",
     },
     {
-        "asset_name": "cash",
-        "asset_ticker": "",
+        "asset_name": "British Pound",
+        "asset_ticker": "cash",
         "quantity": 100.00,
         "currency": "GBP",
     },

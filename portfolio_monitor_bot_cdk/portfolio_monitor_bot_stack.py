@@ -25,7 +25,7 @@ class PortfolioMonitorBotStack(Stack):
         rule = events.Rule(
             self,
             "DailyRule",
-            schedule=events.Schedule.cron(minute="0", hour="0"), # Set to run daily at midnight
+            schedule=events.Schedule.cron(minute="0", hour="12"), # Set to run daily at midday UTC
         )
 
         rule.add_target(targets.LambdaFunction(portfolio_monitor_function))

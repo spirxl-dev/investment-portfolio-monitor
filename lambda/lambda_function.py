@@ -1,51 +1,42 @@
 from datetime import datetime
-from logging import getLogger, INFO
 import urllib3
 import json
 from config import PORTFOLIO, EODHD_API_KEY, WEBHOOK_URL
 
-logger = getLogger()
-logger.setLevel(INFO)
 
-
-def get_eod_adj_close_price(asset_ticker, asset_name) -> tuple[int, str]:
+def get_eod_adj_close_price(asset_ticker) -> tuple[float, str, float]:
     http = urllib3.PoolManager()
     url = f"https://eodhd.com/api/eod/{asset_ticker}?api_token={EODHD_API_KEY}&fmt=json&order=d"
     response = http.request("GET", url)
     data = json.loads(response.data.decode("utf-8"))
-    adj_close_price: int = data[0]["adjusted_close"]
-    adj_close_date: str = data[0]["date"]
-    logger.info(f"Adjusted close price for {asset_name}: £{adj_close_price}")
 
-    return adj_close_price, adj_close_date 
+    current_adj_close_price: float = data[0]["adjusted_close"]
+    current_adj_close_date: str = data[0]["date"]
+
+    prev_adj_close_price: float = data[1]["adjusted_close"]
+
+    return current_adj_close_price, current_adj_close_date, prev_adj_close_price
 
 
-def calculate_portfolio_value() -> float:
+def calculate_portfolio_value():
     total_value = 0
 
     for asset in PORTFOLIO:
-        asset_name = asset["asset_name"]
-        asset_ticker = asset["asset_ticker"]
-        asset_quantity = asset["quantity"]
+        asset_ticker: str = asset["asset_ticker"]
+        asset_quantity: float = asset["quantity"]
 
         if asset_ticker == "cash":
-            logger.info(f"Adding cash to total value: £{asset_quantity}")
             total_value += asset_quantity
         else:
-            adjusted_close_price, adjusted_close_price_date = get_eod_adj_close_price(
-                asset_ticker, asset_name
+            current_adj_close_price, current_adj_close_date, _ = get_eod_adj_close_price(
+                asset_ticker
             )
-            if adjusted_close_price == 0.0:
-                logger.warning(f"Skipped {asset_ticker} due to missing price data.")
+            if current_adj_close_price == 0.0:
                 continue
-            total_asset_value = round(adjusted_close_price * asset_quantity, 2)
-            logger.info(
-                f"Total value of {asset_quantity} units of {asset_name}: £{total_asset_value:,.2f}"
-            )
+            total_asset_value: float = round(current_adj_close_price * asset_quantity, 2)
             total_value += total_asset_value
 
-    logger.info(f"Total portfolio value calculated: {total_value:,.2f}")
-    return total_value, adjusted_close_price_date
+    return total_value, current_adj_close_date
 
 
 def send_webhook_message(message) -> int:
@@ -61,10 +52,8 @@ def send_webhook_message(message) -> int:
             body=encoded_data,
             headers=headers,
         )
-        logger.info(f"Webhook message sent. Response status: {response.status}")
         return response.status
     except Exception as e:
-        logger.error(f"Error sending webhook message: {e}")
         return 500
 
 

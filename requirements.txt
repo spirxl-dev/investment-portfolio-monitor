@@ -12,3 +12,4 @@ python-dateutil==2.9.0.post0
 six==1.16.0
 typeguard==2.13.3
 typing_extensions==4.12.2
+urllib3==2.2.2

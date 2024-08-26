@@ -1,6 +1,6 @@
+import json
 from datetime import datetime
 import urllib3
-import json
 from config import PORTFOLIO, EODHD_API_KEY, WEBHOOK_URL
 
 
@@ -19,24 +19,35 @@ def get_eod_adj_close_price(asset_ticker) -> tuple[float, str, float]:
 
 
 def calculate_portfolio_value():
-    total_value = 0
+    current_total_value = 0.0
+    prev_total_value = 0.0
 
     for asset in PORTFOLIO:
         asset_ticker: str = asset["asset_ticker"]
         asset_quantity: float = asset["quantity"]
 
         if asset_ticker == "cash":
-            total_value += asset_quantity
+            current_total_value += asset_quantity
+            prev_total_value += asset_quantity
         else:
-            current_adj_close_price, current_adj_close_date, _ = get_eod_adj_close_price(
-                asset_ticker
+            current_adj_close_price, current_adj_close_date, prev_adj_close_price = (
+                get_eod_adj_close_price(asset_ticker)
             )
-            if current_adj_close_price == 0.0:
-                continue
-            total_asset_value: float = round(current_adj_close_price * asset_quantity, 2)
-            total_value += total_asset_value
+            total_current_asset_value: float = round(
+                current_adj_close_price * asset_quantity, 2
+            )
+            total_prev_asset_value: float = round(
+                prev_adj_close_price * asset_quantity, 2
+            )
 
-    return total_value, current_adj_close_date
+            prev_total_value += total_prev_asset_value
+            current_total_value += total_current_asset_value
+
+    percentage_change: float = round(
+        ((current_total_value - prev_total_value) / prev_total_value) * 100, 2
+    )
+
+    return current_total_value, current_adj_close_date, percentage_change
 
 
 def send_webhook_message(message) -> int:
@@ -53,16 +64,16 @@ def send_webhook_message(message) -> int:
             headers=headers,
         )
         return response.status
-    except Exception as e:
+    except Exception:
         return 500
 
 
 def lambda_handler(event, context):
-    total_value, date_time = calculate_portfolio_value()
+    total_value, date_time, percentage_change = calculate_portfolio_value()
 
     fmtd_total_value = f"£{total_value:,.2f}"
     fmtd_date_time = datetime.strptime(date_time, "%Y-%m-%d").strftime("%d %B %Y")
 
-    message = f"Total Value: {fmtd_total_value}\nLast Close: {fmtd_date_time}"
+    message = f"\nVanguard Portfolio: **{fmtd_total_value}**\nLast Close: **{fmtd_date_time}**\nPrev. Close Change: **{percentage_change}**%"
 
     send_webhook_message(message)

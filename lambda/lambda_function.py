@@ -8,22 +8,16 @@ logger = getLogger()
 logger.setLevel(INFO)
 
 
-def get_eod_adj_close_price(asset_ticker, asset_name):
-    try:
-        http = urllib3.PoolManager()
-        url = f"https://eodhd.com/api/eod/{asset_ticker}?api_token={EODHD_API_KEY}&fmt=json&order=d"
-        response = http.request("GET", url)
-        data = json.loads(response.data.decode("utf-8"))
+def get_eod_adj_close_price(asset_ticker, asset_name) -> tuple[int, str]:
+    http = urllib3.PoolManager()
+    url = f"https://eodhd.com/api/eod/{asset_ticker}?api_token={EODHD_API_KEY}&fmt=json&order=d"
+    response = http.request("GET", url)
+    data = json.loads(response.data.decode("utf-8"))
+    adj_close_price: int = data[0]["adjusted_close"]
+    adj_close_date: str = data[0]["date"]
+    logger.info(f"Adjusted close price for {asset_name}: £{adj_close_price}")
 
-        adj_close_price = data[0]["adjusted_close"]
-        adj_close_date = data[0]["date"]
-
-        logger.info(f"Adjusted close price for {asset_name}: £{adj_close_price}")
-    except Exception as e:
-        logger.error(f"Error fetching data for {asset_name}: {e}")
-        return 0.0
-
-    return adj_close_price, adj_close_date
+    return adj_close_price, adj_close_date 
 
 
 def calculate_portfolio_value() -> float:

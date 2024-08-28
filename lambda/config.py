@@ -1,6 +1,6 @@
 import os
 
-PORTFOLIO: list = [
+VANGUARD_PORTFOLIO: list = [
     {
         "asset_name": "Asset 1",
         "asset_ticker": "TICKER1.EXCHANGE",

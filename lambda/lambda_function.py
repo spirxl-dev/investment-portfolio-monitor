@@ -1,7 +1,25 @@
 import json
 from datetime import datetime
 import urllib3
-from config import PORTFOLIO, EODHD_API_KEY, WEBHOOK_URL
+from lxml import html
+import re
+from config import VANGUARD_PORTFOLIO, EODHD_API_KEY, WEBHOOK_URL
+
+
+def get_hsbc_ftse_all_world_price() -> float:
+    http = urllib3.PoolManager()
+    response = http.request(
+        "GET",
+        "https://www.fidelity.co.uk/factsheet-data/factsheet/GB00BMJJJF91-hsbc-ftse-all-world-index-c-acc/key-statistics",
+    )
+    tree = html.fromstring(response.data)
+
+    element = tree.xpath(
+        '//*[@id="__next"]/div/div[1]/div[1]/div[1]/div[2]/div[1]/div/div/div[1]/h3'
+    )
+    price: float = round(float(re.sub(r"[^0-9.]", "", element[0].text.strip())), 2)
+
+    return price
 
 
 def get_eod_adj_close_price(asset_ticker) -> tuple[float, str, float]:
@@ -22,7 +40,7 @@ def calculate_portfolio_value():
     current_total_value = 0.0
     prev_total_value = 0.0
 
-    for asset in PORTFOLIO:
+    for asset in VANGUARD_PORTFOLIO:
         asset_ticker: str = asset["asset_ticker"]
         asset_quantity: float = asset["quantity"]
 

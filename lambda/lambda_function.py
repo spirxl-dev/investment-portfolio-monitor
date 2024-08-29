@@ -89,9 +89,15 @@ def send_webhook_message(message) -> int:
 def lambda_handler(event, context):
     total_value, date_time, percentage_change = calculate_portfolio_value()
 
-    fmtd_total_value = f"£{total_value:,.2f}"
-    fmtd_date_time = datetime.strptime(date_time, "%Y-%m-%d").strftime("%d %B %Y")
+    fmtd_total_value: str = f"£{total_value:,.2f}"
+    fmtd_date_time: str = datetime.strptime(date_time, "%Y-%m-%d").strftime("%d %B %Y")
+    fmtd_percentage_change: str = (
+        f"+{percentage_change}%" if percentage_change >= 0 else f"{percentage_change}%"
+    )
 
-    message = f"\nVanguard Portfolio: **{fmtd_total_value}**\nLast Close: **{fmtd_date_time}**\nPrev. Close Change: **{percentage_change}**%"
-
+    message = (
+        f"\nVanguard Portfolio: **{fmtd_total_value}**\n"
+        f"Prev. Close Change: **{fmtd_percentage_change}**"
+        f"Last Close: **{fmtd_date_time}**\n"
+    )
     send_webhook_message(message)

@@ -21,6 +21,14 @@ VANGUARD_PORTFOLIO: list = [
     },
 ]
 
+AJ_BELL_PORTFOLIO: list = [
+    {
+        "asset_name": "HSBC FTSE All-World Index Fund Accumulation C",
+        "quantity": 3539.11,
+        "currency": "GBP",
+    }
+]
+
 
 WEBHOOK_URL: str = os.getenv("WEBHOOK_URL", "")
 EODHD_API_KEY: str = os.getenv("EODHD_API_KEY", "")

@@ -97,19 +97,34 @@ def send_webhook_message(message) -> int:
 
 
 def lambda_handler(event, context):
-    total_value, date_time, percentage_change = calculate_vanguard_portfolio_value()
+    # Vanguard Portfolio Calculation
+    vanguard_total_value, vanguard_date_time, vanguard_percentage_change = calculate_vanguard_portfolio_value()
 
-    fmtd_total_value: str = f"£{total_value:,.2f}"
-    fmtd_date_time: str = datetime.strptime(date_time, "%Y-%m-%d").strftime("%d %B %Y")
-    fmtd_percentage_change: str = (
-        f"+{percentage_change}%" if percentage_change >= 0 else f"{percentage_change}%"
+    fmtd_vanguard_total_value: str = f"£{vanguard_total_value:,.2f}"
+    fmtd_vanguard_date_time: str = datetime.strptime(vanguard_date_time, "%Y-%m-%d").strftime("%d %B %Y")
+    fmtd_vanguard_percentage_change: str = (
+        f"+{vanguard_percentage_change}%" if vanguard_percentage_change >= 0 else f"{vanguard_percentage_change}%"
     )
 
+    # Fidelity Portfolio Calculation
+    fidelity_total_value = calculate_fidelity_portfolio_value()
+    fmtd_fidelity_total_value: str = f"£{fidelity_total_value:,.2f}"
+
+    # Total combined value of both portfolios
+    combined_total_value: float = vanguard_total_value + fidelity_total_value
+    fmtd_combined_total_value: str = f"£{combined_total_value:,.2f}"
+
+    # Construct message
     message = (
-        f"\nVanguard Portfolio: **{fmtd_total_value}**\n"
-        f"Prev. Close Change: **{fmtd_percentage_change}**"
-        f"Last Close: **{fmtd_date_time}**\n"
+        f"\nVanguard Portfolio: **{fmtd_vanguard_total_value}**\n"
+        f"Prev. Close Change: **{fmtd_vanguard_percentage_change}**\n"
+        f"Last Close: **{fmtd_vanguard_date_time}**\n"
+        f"\nFidelity Portfolio: **{fmtd_fidelity_total_value}**\n"
+        f"\nTotal Combined Portfolio Value: **{fmtd_combined_total_value}**\n"
     )
+
+    # Sending the webhook message
     send_webhook_message(message)
 
+lambda_handler(event=None, context=None)
 

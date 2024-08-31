@@ -3,23 +3,7 @@ from datetime import datetime
 import urllib3
 from lxml import html
 import re
-from config import VANGUARD_PORTFOLIO, EODHD_API_KEY, WEBHOOK_URL
-
-
-def get_hsbc_ftse_all_world_price() -> float:
-    http = urllib3.PoolManager()
-    response = http.request(
-        "GET",
-        "https://www.fidelity.co.uk/factsheet-data/factsheet/GB00BMJJJF91-hsbc-ftse-all-world-index-c-acc/key-statistics",
-    )
-    tree = html.fromstring(response.data)
-
-    element = tree.xpath(
-        '//*[@id="__next"]/div/div[1]/div[1]/div[1]/div[2]/div[1]/div/div/div[1]/h3'
-    )
-    price: float = round(float(re.sub(r"[^0-9.]", "", element[0].text.strip())), 2)
-
-    return price
+from config import VANGUARD_PORTFOLIO, AJ_BELL_PORTFOLIO, EODHD_API_KEY, WEBHOOK_URL
 
 
 def get_eod_adj_close_price(asset_ticker) -> tuple[float, str, float]:
@@ -36,7 +20,7 @@ def get_eod_adj_close_price(asset_ticker) -> tuple[float, str, float]:
     return current_adj_close_price, current_adj_close_date, prev_adj_close_price
 
 
-def calculate_portfolio_value():
+def calculate_vanguard_portfolio_value():
     current_total_value = 0.0
     prev_total_value = 0.0
 
@@ -68,6 +52,32 @@ def calculate_portfolio_value():
     return current_total_value, current_adj_close_date, percentage_change
 
 
+def calculate_fidelity_portfolio_value():
+    def get_hsbc_ftse_all_world_price(quantity: float) -> float:
+        http = urllib3.PoolManager()
+        response = http.request(
+            "GET",
+            "https://www.fidelity.co.uk/factsheet-data/factsheet/GB00BMJJJF91-hsbc-ftse-all-world-index-c-acc/key-statistics",
+        )
+        tree = html.fromstring(response.data)
+
+        element = tree.xpath(
+            '//*[@id="__next"]/div/div[1]/div[1]/div[1]/div[2]/div[1]/div/div/div[1]/h3'
+        )
+        price = float(re.sub(r"[^0-9.]", "", element[0].text.strip()))
+
+        total_value = round((quantity * price), 2)
+        return total_value
+
+    current_total_value = 0.0
+
+    for asset in AJ_BELL_PORTFOLIO:
+        asset_quantity: float = asset["quantity"]
+        current_total_value = get_hsbc_ftse_all_world_price(asset_quantity)
+
+    return current_total_value
+
+
 def send_webhook_message(message) -> int:
     try:
         http = urllib3.PoolManager()
@@ -87,7 +97,7 @@ def send_webhook_message(message) -> int:
 
 
 def lambda_handler(event, context):
-    total_value, date_time, percentage_change = calculate_portfolio_value()
+    total_value, date_time, percentage_change = calculate_vanguard_portfolio_value()
 
     fmtd_total_value: str = f"£{total_value:,.2f}"
     fmtd_date_time: str = datetime.strptime(date_time, "%Y-%m-%d").strftime("%d %B %Y")
@@ -101,3 +111,5 @@ def lambda_handler(event, context):
         f"Last Close: **{fmtd_date_time}**\n"
     )
     send_webhook_message(message)
+
+

@@ -23,8 +23,8 @@ VANGUARD_PORTFOLIO: list = [
 
 AJ_BELL_PORTFOLIO: list = [
     {
-        "asset_name": "HSBC FTSE All-World Index Fund Accumulation C",
-        "quantity": 3539.11,
+        "asset_name": "Asse 4",
+        "quantity": 100.00,
         "currency": "GBP",
     }
 ]

@@ -7,8 +7,10 @@ cattrs==23.2.3
 constructs==10.3.0
 importlib_resources==6.4.2
 jsii==1.102.0
+lxml==5.3.0
 publication==0.0.3
 python-dateutil==2.9.0.post0
+pytz==2024.2
 six==1.16.0
 typeguard==2.13.3
 typing_extensions==4.12.2

@@ -2,29 +2,23 @@ import os
 
 VANGUARD_PORTFOLIO: list = [
     {
-        "asset_name": "Asset 1",
-        "asset_ticker": "TICKER1.EXCHANGE",
-        "quantity": 100,
-        "currency": "GBP",
-    },
-    {
-        "asset_name": "Asset 2",
-        "asset_ticker": "TICKER2.EXCHANGE",
-        "quantity": 50,
+        "asset_name": "Vanguard S&P 500 UCITS ETF USD Acc",
+        "asset_ticker": "VUAG.LSE",
+        "quantity": 258,
         "currency": "GBP",
     },
     {
         "asset_name": "British Pound",
         "asset_ticker": "cash",
-        "quantity": 100.00,
+        "quantity": 17.58,
         "currency": "GBP",
     },
 ]
 
 AJ_BELL_PORTFOLIO: list = [
     {
-        "asset_name": "Asse 4",
-        "quantity": 100.00,
+        "asset_name": "HSBC FTSE ALL WORLD INDEX",
+        "quantity": 5080.68,
         "currency": "GBP",
     }
 ]

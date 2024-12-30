@@ -1,0 +1,13 @@
+services:
+  portfolio-tracker:
+    build: .
+    container_name: portfolio-tracker
+    restart: always
+    environment:
+      - WEBHOOK_URL=https://discord.com/api/webhooks/1273287308841451591/yM2b2nxnooLJC6ciCDUxhIv5U3aQnV6rbNbvxYDHPrR56exMtbC7jc17KGutxhX-N0xR
+      - EODHD_API_KEY=648a1ac609a6b0.87117060
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

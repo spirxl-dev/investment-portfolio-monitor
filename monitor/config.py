@@ -4,13 +4,13 @@ VANGUARD_PORTFOLIO: list = [
     {
         "asset_name": "Vanguard S&P 500 UCITS ETF USD Acc",
         "asset_ticker": "VUAG.LSE",
-        "quantity": 258,
+        "quantity": 0,
         "currency": "GBP",
     },
     {
         "asset_name": "British Pound",
         "asset_ticker": "cash",
-        "quantity": 17.58,
+        "quantity": 0,
         "currency": "GBP",
     },
 ]
@@ -18,7 +18,7 @@ VANGUARD_PORTFOLIO: list = [
 AJ_BELL_PORTFOLIO: list = [
     {
         "asset_name": "HSBC FTSE ALL WORLD INDEX",
-        "quantity": 5080.68,
+        "quantity": 0,
         "currency": "GBP",
     }
 ]
